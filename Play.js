@@ -1,3 +1,5 @@
+const fetch = require('node-fetch');
+
 module.exports = (bot) => {
   bot.command('play', async (ctx) => {
     const args = ctx.message.text.split(' ').slice(1).join(' ');
