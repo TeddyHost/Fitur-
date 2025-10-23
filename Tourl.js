@@ -1,7 +1,7 @@
 const axios = require("axios");
 const FormData = require("form-data");
 
-module.exports = (bot) {
+module.exports = (bot) => {
   bot.command("tourl", async (ctx) => {
     const repliedMsg = ctx.message.reply_to_message;
 
