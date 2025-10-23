@@ -50,7 +50,7 @@ module.exports = (bot) {
         ctx.chat.id,
         processingMsg.message_id,
         null,
-        `✅ *Berhasil Menjadikan Link*\n\n🌐 URL: ${catboxUrl}\n\n_By Nted Crasher - Bot Bug_`,
+        `✅ *Berhasil Menjadikan Link*\n\n🌐 URL: `${catboxUrl}`\n\n_By Nted Crasher - Bot Bug_`,
         { parse_mode: "Markdown" }
       );
     } catch (error) {
