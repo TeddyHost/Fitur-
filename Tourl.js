@@ -5,8 +5,15 @@ module.exports = (bot) => {
   bot.command("tourl", async (ctx) => {
     const repliedMsg = ctx.message.reply_to_message;
 
-    if (!repliedMsg || (!repliedMsg.document && !repliedMsg.photo && !repliedMsg.video)) {
-      return ctx.reply("Bro? Foto Nya Yg Mau Di Jadikan Tourl Mana?\nContoh Reply Photo /tourl");
+    // Validasi pesan reply
+    if (
+      !repliedMsg ||
+      (!repliedMsg.document && !repliedMsg.photo && !repliedMsg.video)
+    ) {
+      return ctx.reply(
+        "Bro? Foto/Videonya yang mau dijadikan link mana?\n\n📌 *Contoh:* reply foto, lalu ketik `/tourl`",
+        { parse_mode: "Markdown" }
+      );
     }
 
     let fileId, fileName;
@@ -24,7 +31,7 @@ module.exports = (bot) => {
     }
 
     try {
-      const processingMsg = await ctx.reply("Proses Bentar Yak\nGak Sabar Mati Aja Anjg");
+      const processingMsg = await ctx.reply("⏳ Proses bentar yak...\nGak sabar? mati aja anjg 😎");
 
       // Ambil link file Telegram
       const file = await ctx.telegram.getFile(fileId);
@@ -38,19 +45,23 @@ module.exports = (bot) => {
       form.append("reqtype", "fileupload");
       form.append("fileToUpload", fileStream.data, fileName);
 
-      const { data: catboxUrl } = await axios.post("https://catbox.moe/user/api.php", form, {
-        headers: form.getHeaders(),
-      });
+      const { data: catboxUrl } = await axios.post(
+        "https://catbox.moe/user/api.php",
+        form,
+        { headers: form.getHeaders() }
+      );
 
+      // Validasi hasil
       if (!catboxUrl.startsWith("https://")) {
         throw new Error("Catbox tidak mengembalikan URL yang valid");
       }
 
+      // Edit pesan hasil upload
       await ctx.telegram.editMessageText(
         ctx.chat.id,
         processingMsg.message_id,
         null,
-        `✅ *Berhasil Menjadikan Link*\n\n🌐 URL: `${catboxUrl}`\n\n_By Nted Crasher - Bot Bug_`,
+        `✅ *Berhasil dijadikan link!*\n\n🌐 URL:\n${catboxUrl}\n\n_By Nted Crasher - Bot Bug_`,
         { parse_mode: "Markdown" }
       );
     } catch (error) {
