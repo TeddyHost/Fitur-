@@ -5,13 +5,10 @@ module.exports = (bot) => {
   bot.command("tourl", async (ctx) => {
     const repliedMsg = ctx.message.reply_to_message;
 
-    // Validasi pesan reply
-    if (
-      !repliedMsg ||
-      (!repliedMsg.document && !repliedMsg.photo && !repliedMsg.video)
-    ) {
+    // Cek apakah reply ke foto / video / dokumen
+    if (!repliedMsg || (!repliedMsg.document && !repliedMsg.photo && !repliedMsg.video)) {
       return ctx.reply(
-        "Bro? Foto/Videonya yang mau dijadikan link mana?\n\n📌 *Contoh:* reply foto, lalu ketik `/tourl`",
+        "📸 Bro? Mana file yang mau dijadikan link?\n\nContoh: *reply foto lalu ketik /tourl*",
         { parse_mode: "Markdown" }
       );
     }
@@ -33,11 +30,11 @@ module.exports = (bot) => {
     try {
       const processingMsg = await ctx.reply("⏳ Proses bentar yak...\nGak sabar? mati aja anjg 😎");
 
-      // Ambil link file Telegram
+      // Ambil file Telegram
       const file = await ctx.telegram.getFile(fileId);
       const fileLink = `https://api.telegram.org/file/bot${bot.token}/${file.file_path}`;
 
-      // Ambil file dalam bentuk stream
+      // Ambil file stream
       const fileStream = await axios.get(fileLink, { responseType: "stream" });
 
       // Upload ke Catbox
@@ -45,18 +42,16 @@ module.exports = (bot) => {
       form.append("reqtype", "fileupload");
       form.append("fileToUpload", fileStream.data, fileName);
 
-      const { data: catboxUrl } = await axios.post(
-        "https://catbox.moe/user/api.php",
-        form,
-        { headers: form.getHeaders() }
-      );
+      const { data: catboxUrl } = await axios.post("https://catbox.moe/user/api.php", form, {
+        headers: form.getHeaders(),
+      });
 
-      // Validasi hasil
+      // Cek URL hasil
       if (!catboxUrl.startsWith("https://")) {
         throw new Error("Catbox tidak mengembalikan URL yang valid");
       }
 
-      // Edit pesan hasil upload
+      // Edit pesan jadi hasil link
       await ctx.telegram.editMessageText(
         ctx.chat.id,
         processingMsg.message_id,
